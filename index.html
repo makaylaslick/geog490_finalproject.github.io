@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+
+<body>
+
+  <header>
+    <h1 style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">ODF Fire Analysis Between 2000 and 2022</h1>
+    <p>Author: Makayla Slick</p>
+    <p>GEOG 490</p>
+    <p>Final Project</p>
+    <p>Due: 3/14/2024</p>
+  </header>
+
+  <section id="introduction">
+    <h2>Introduction</h2>
+    <pre style="font-family: 'Times New Roman', Times, serif;">
+        The analysis performed through this project was on a comprehensive dataset 
+        containing information on fire statistics from 2000 to 2024 from the Oregon 
+        Department of Forestry. The aim of this analysis is to study the prevalence 
+        of fires across a variety of different causes, across different land ownership
+        types, and provide a general understanding of the distribution of fires across
+        Oregon to provide insights into the dynamics of wildfires.
+    </pre>
+  </section>
+
+  <section id="flame-height-section">
+    <a href=https://data.oregon.gov/Natural-Resources/ODF-Fire-Occurrence-Data-2000-2022/fbwv-q84y/about_data>Link to download data</a></li>
+    <pre>
+Screenshots of the images are attached in the GitHub
+    
+Code to produce graphs:
+  ```{r}
+  # Installing packages
+  library(dplyr)
+  library(ggplot2)
+  library(leaflet)
+  ```
+
+  ```{r}
+  # Setting and reading csv
+  file_path <- "C:/Users/Makayla Slick/Downloads/ODF_Fire_Occurrence_Data_2000-2022.csv"
+  ODF_fire_data <- read.csv(file_path)
+
+  # attaching and reading Data
+  attach(ODF_fire_data)
+  ```
+  ```{r}
+  fire_map <- leaflet(fire_data) %>%
+    addTiles() %>%  # Use the default OpenStreetMap tiles
+    addCircleMarkers(
+      lng = ~Long_DD,
+      lat = ~Lat_DD,
+      popup = ~paste("FireName: ", FireName, "<br> EstTotalAcres: ", EstTotalAcres),
+      label = ~FireName,
+      color = "red",
+      fillOpacity = 0.05,
+      radius = .15
+    ) %>%
+    addLegend("bottomright", colors = "red", labels = "Fire Incidents")
+
+  # Display the map
+  fire_map
+  ```
+  ```{r}
+  # Create a bar chart for the count of fires by CauseBy
+  fires_count_chart <- ggplot(ODF_fire_data, aes(x = CauseBy)) +
+    geom_bar(fill = "green", alpha = 0.7) +
+    labs(title = "Number of Fires by CauseBy",
+         x = "CauseBy",
+         y = "Number of Fires") +
+    geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  fires_count_chart
+  ```
+  ```{r}
+  # Create a bar chart for the count of fires by CauseBy
+  fires_count_chart <- ggplot(ODF_fire_data, aes(x = FO_LandOwnType)) +
+    geom_bar(fill = "pink", alpha = 0.7) +
+    labs(title = "Number of Fires From Each Type of Source",
+         x = "Type of Land Ownership",
+         y = "Number of Fires") +
+    geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+  fires_count_chart
+  ```
+
+  ```{r}
+  ruralres_df <- ODF_fire_data %>%
+    filter(FO_LandOwnType == "Rural Residential")
+  ```
+
+  ```{r}
+  industrial_df <- ODF_fire_data %>%
+  filter(FO_LandOwnType == "Industrial")
+  ```
+
+  ```{r}
+  # Create a bar chart
+  industrial_cb_barchart <- ggplot(ODF_fire_data, aes(x = CauseBy)) +
+    geom_bar(fill = "lightblue", alpha = 0.7) +
+    labs(title = "Number of Fires From Each Type of Source in Rural Residential Areas",
+         x = "Caused By",
+         y = "Number of Fires") +
+    geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  industrial_cb_barchart
+  ```
+  ```{r}
+  rr_cb_bb <- ggplot(ruralres_df, aes(x = CauseBy)) +
+    geom_bar(fill = "violet", alpha = 0.7) +
+    labs(title = "Number of Fires by CauseBy in Rural Residential Areas",
+         x = "Caused By",
+         y = "Number of Fires") +
+    geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  rr_cb_bb
+  ```
+    </pre>
+    <h2>Graphs and Maps of Data</h2>
+
+  <section id="fire-size-section">
+    <img src="/images/Screenshot m.png" alt="" width="1000" height="560">
+    <p>The map above shows the distribution of fires across Oregon.</p>
+    <img src="/images/Screenshot g.png" alt="" width="1000" height="560">
+    <p>The graph above shows the number of fires for each type of fire cause.</p>
+    <img src="/images/GEOG_490_R/Screenshot pi.png" alt="" width="1000" height="560">
+    <p>The graph above shows the number of fires across the whole dataset that occured on different land types.</p>
+    <img src="/images/GEOG_490_R/Screenshot p.png" alt="" width="1000" height="560">
+    <p>The graph above shows the number of fires for different types of fire causes in rural residential areas.</p>
+    <img src="/images/GEOG_490_R/Screenshot b.png" alt="" width="1000" height="560">
+    <p>The graph above displays the number of fires for different types of fire causes in industrial areas.</p>
+  </section>
+
+  <section id="analysis">
+    <h2>Analysis</h2>
+    <pre style="font-family: 'Times New Roman', Times, serif;">
+      The chart of the number of fires by each cause of fire eludes that lightning is the highest risk for wildfires,
+      followed by ruralist playing and recreationist causes. This analysis, coupled with the following graph showing the highest
+      number of fires occure in rural residential areas, and industrial areas allow for an understanding of what are the 
+      most commen causes of fires within these two areas and how it compares to fires in general. In rural residential areas,
+      the largest cause for fire is ruralist paying, which provides information into lightning not being a control factor in these
+      areas. This means there are not precaustions that can be taken that have not already in order to prevent wildfires, 
+      resulting in a lower priortiy for wildfire mitigation. Though there is a higher rate of fires caused by ruralist paying,
+      allowing for further research into the preventative measures in this scope. In the industrial areas, the highest cause 
+      for wildfires includes both lightning as well as recreationist. Therefore, fire mitigation tasks and projections can 
+      be made for these two sectors when understanding how to preventing the most commen fire causes. In comparison to the 
+      map it can be seen there is a higher ratio of the fires on the west coast of Oregon, through central Oregon, and slightly 
+      higher in north eastern Oregon, compared to southeastern Oregon. This information can provide specific hotspots for wildfires, 
+      and priority regions for wildfire mitigation.
+    </pre>
+  </section>
+
+</body>
+
+</html>
